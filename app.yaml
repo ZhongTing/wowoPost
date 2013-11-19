@@ -5,9 +5,15 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
+- url: /index
+  static_dir: index.html
+- url: /hello
   script: helloworld.application
+- url: /.*
+  script: wowopost.application
   
 libraries:
 - name: webapp2
+  version: latest
+- name: jinja2
   version: latest
