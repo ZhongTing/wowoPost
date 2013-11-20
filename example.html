@@ -23,8 +23,42 @@
 		   <input type="button" onclick="send()" value="Post"/>
 		   </form>
 	    </div>
+        <div>
+            <input type="button" onclick="feed()" value="Feed and Share Dialogs"/>
+            <input type="button" onclick="sendDialog()" value="Send Dialog"/>
+            <br>
+            <input id="message2" type="text"/>
+            <input type="button" onclick="tagAndSend()" value="Send and Tag"/>
+        </div>
     {% endif %}
     <script>
+      function tagAndSend()
+      {
+        var msg = $("#message2").val();
+        FB.api('/me/feed', 'post', { message: msg ,tags:'believe75467',place:108479922509500}, function(response) {
+          if (!response || response.error) {
+            alert('Error occured');
+          } else {
+            alert('Post ID: ' + response.id);
+          }
+        });
+      }
+      function feed()
+      {
+        FB.ui({
+          method: 'feed',
+          link: 'https://developers.facebook.com/docs/dialogs/',
+          caption: 'An example caption',
+          to : 'believe75467',
+        }, function(response){});
+      }
+      function sendDialog()
+      {
+        FB.ui({
+          method: 'send',
+          link: 'empty'
+        });
+      }
       function send()
       {
         var message = $("#message").val();
