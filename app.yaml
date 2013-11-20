@@ -5,9 +5,14 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /.*
-  script: helloworld.application
+- url: /
+  script: example.app
   
+- url: /example.*
+  script: example.app
+
 libraries:
 - name: webapp2
+  version: latest
+- name: jinja2
   version: latest

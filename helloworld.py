@@ -106,6 +106,6 @@ class Guestbook(webapp2.RequestHandler):
 
 
 application = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/sign', Guestbook),
+    (r'/.*', MainPage),
+    (r'/sign.*', Guestbook),
 ], debug=True)
