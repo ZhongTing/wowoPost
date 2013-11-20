@@ -5,8 +5,17 @@ api_version: 1
 threadsafe: true
 
 handlers:
+<<<<<<< HEAD
 - url: /
   script: example.app
+=======
+- url: /index
+  static_dir: index.html
+- url: /hello
+  script: helloworld.application
+- url: /.*
+  script: wowopost.application
+>>>>>>> 432530c9df182dc890a2e929dff6bc34f5f67b5f
   
 - url: /example.*
   script: example.app
