@@ -19,7 +19,7 @@
 	    <div>
 	    Upload photo test: 
 		   <form method="post">
-		   Message:<input id="message" type="text" name="url"/>
+		   Message:<input id="message" type="text" name="url" value=""/>
 		   <input type="button" onclick="send()" value="Post"/>
 		   </form>
 	    </div>
@@ -32,17 +32,37 @@
         </div>
     {% endif %}
     <script>
-      function tagAndSend()
-      {
-        var msg = $("#message2").val();
-        FB.api('/me/feed', 'post', { message: msg ,tags:'believe75467',place:108479922509500}, function(response) {
-          if (!response || response.error) {
-            alert('Error occured');
-          } else {
-            alert('Post ID: ' + response.id);
-          }
-        });
-      }
+        function send()
+        {
+            var message = $("#message").val();
+            var userId = '{{ current_user.id }}';
+            var accessToken = '{{ current_user.access_token }}';
+            var with_tags = [];
+            with_tags.push(["1428774067", "陳科銘"]);
+            
+            $.ajax({
+                type: "POST",
+                url: "https://graph.facebook.com/"+userId+"/feed",
+                data: { message: message, access_token: accessToken, tags: 1428774067, place: 132738745815}
+            })
+                .done(function( msg ) {
+                alert( "Data: " + JSON.stringify(msg) );
+            })
+                .error(function( msg ) {
+                alert( msg.responseText );
+            });
+        }      
+        function tagAndSend()
+        {
+            var msg = $("#message2").val();
+            FB.api('/me/feed', 'post', { message: msg ,tags:'believe75467',place:108479922509500}, function(response) {
+              if (!response || response.error) {
+                alert('Error occured');
+              } else {
+                alert('Post ID: ' + response.id);
+              }
+            });
+        }
       function feed()
       {
         FB.ui({
@@ -58,20 +78,6 @@
           method: 'send',
           link: 'empty'
         });
-      }
-      function send()
-      {
-        var message = $("#message").val();
-        var userId = '{{ current_user.id }}';
-        var accessToken = '{{ current_user.access_token }}';
-        $.ajax({
-          type: "POST",
-          url: "https://graph.facebook.com/"+userId+"/feed?message="+message+"&access_token="+accessToken,
-          data: { message: message, access_token: accessToken }
-        })
-          .done(function( msg ) {
-            alert( "Data Saved: " + msg );
-          });
       }
       window.fbAsyncInit = function() {
         FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
