@@ -147,7 +147,7 @@ class LogoutHandler(BaseHandler):
         if self.current_user is not None:
             self.session['user'] = None
 
-        self.redirect('/')
+        self.redirect('/example')
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__))
