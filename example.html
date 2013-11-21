@@ -1,28 +1,28 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Facebook Example</title>
-    <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-  </head>
-  <body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>Facebook Example</title>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    </head>
+    <body>
     <fb:login-button autologoutlink="true" scope="publish_stream"></fb:login-button>
-
+    
     {% if current_user %}
-      <p><a href="{{ current_user.profile_url }}"><img src="http://graph.facebook.com/{{ current_user.id }}/picture?type=square"/></a></p>
-      <p>Hello, {{ current_user.name|escape }}</p>
+        <p><a href="{{ current_user.profile_url }}"><img src="http://graph.facebook.com/{{ current_user.id }}/picture?type=square"/></a></p>
+        <p>Hello, {{ current_user.name|escape }}</p>
     {% endif %}
-
+    
     <div id="fb-root"></div>
     
     {% if current_user %}
-	    <div>
-	    Upload photo test: 
-		   <form method="post">
-		   Message:<input id="message" type="text" name="url" value=""/>
-		   <input type="button" onclick="pySend()" value="Post"/>
-		   </form>
-	    </div>
+        <div>
+        Upload photo test: 
+    	   <form method="post">
+    	   Message:<input id="message" type="text" name="url" value=""/>
+    	   <input type="button" onclick="pySend()" value="Post"/>
+    	   </form>
+        </div>
         <div>
             <input type="button" onclick="feed()" value="Feed and Share Dialogs"/>
             <input type="button" onclick="sendDialog()" value="Send Dialog"/>
@@ -39,7 +39,7 @@
             $.ajax({
                 type: "POST",
                 url: "/example/feed",
-                data: { message: message, tags: 1261346803, place: 108479922509500}
+                data: { message: message, tags: 1261346803, place: 108479922509500, to: 1261346803}
             })
                 .done(function( msg ) {
                 alert( "Data: " + msg );
@@ -88,30 +88,44 @@
               to : 'believe75467',
             }, function(response){});*/
         }
-      function sendDialog()
-      {
-        FB.ui({
-          method: 'send',
-          link: 'http://140.124.181.7:1221',
-          caption: 'An example caption',
-          to : 'believe75467',
-        });
-      }
-      
-      window.fbAsyncInit = function() {
-        FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
-                 xfbml: true});
-        FB.Event.subscribe('{% if current_user %}auth.logout{% else %}auth.login{% endif %}', function(response) {
-          {% if current_user %} window.location = "/example/logout" {% else %} window.location.reload(); {% endif %}
-        });
-      };
-      (function() {
-        var e = document.createElement('script');
-        e.type = 'text/javascript';
-        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
-        e.async = true;
-        document.getElementById('fb-root').appendChild(e);
-      }());
+        function sendDialog()
+        {
+            /*FB.ui({
+            method: 'send',
+            link: 'http://140.124.181.7:1221',
+            caption: 'An example caption',
+            to : 'believe75467',
+            });*/
+            
+            FB.api('/me/friends', function(response) {
+                console.log(response);
+            });
+        }
+        
+        window.fbAsyncInit = function() 
+        {
+            FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true, xfbml: true});
+            
+            {% if current_user %}
+            FB.Event.subscribe('auth.logout', function(response) {
+                window.location = "/example/logout";
+            });
+            
+            {% else %}
+            FB.Event.subscribe('auth.login', function(response) {
+                window.location.reload();
+            });
+            
+            {% endif %}
+        };
+        
+        (function() {
+            var e = document.createElement('script');
+            e.type = 'text/javascript';
+            e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+            e.async = true;
+            document.getElementById('fb-root').appendChild(e);
+        }());
     </script>
-  </body>
+    </body>
 </html>
