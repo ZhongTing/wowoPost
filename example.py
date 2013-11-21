@@ -141,6 +141,17 @@ class HomeHandler(BaseHandler):
                      "photo.php?fbid={0}".format(response['id']))
         self.redirect(str(photo_url))
 
+class FeedHandler(BaseHandler):
+    def post(self):
+        message = self.request.get('message')
+        
+        graph = facebook.GraphAPI(self.current_user['access_token'])
+        attachment = {}
+        attachment["tags"] = self.request.get('tags')
+        attachment["place"] = self.request.get('place')
+        post_object_id = graph.put_wall_post(message, attachment)
+        
+        self.response.write(post_object_id)
 
 class LogoutHandler(BaseHandler):
     def get(self):
@@ -154,7 +165,9 @@ jinja_environment = jinja2.Environment(
 )
 
 app = webapp2.WSGIApplication(
-    [(r'/.*', HomeHandler), (r'/logout.*', LogoutHandler)],
+    [(r'/.*/feed', FeedHandler),
+    (r'/.*/logout', LogoutHandler),
+    (r'/.*', HomeHandler)],
     debug=True,
     config=config
 )

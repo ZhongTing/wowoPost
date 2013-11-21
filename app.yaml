@@ -14,9 +14,6 @@ handlers:
 - url: /hello
   script: helloworld.application
   
-- url: /.*
-  script: wowopost.application
-  
 libraries:
 - name: webapp2
   version: latest
