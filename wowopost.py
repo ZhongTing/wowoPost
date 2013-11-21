@@ -45,5 +45,4 @@ class AutoAddTestCase(webapp2.RequestHandler):
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/autoAdd',AutoAddTestCase),
 ], debug=True)
