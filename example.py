@@ -147,6 +147,7 @@ class FeedHandler(BaseHandler):
         
         graph = facebook.GraphAPI(self.current_user['access_token'])
         attachment = {}
+        attachment["to"] = self.request.get('to')
         attachment["tags"] = self.request.get('tags')
         attachment["place"] = self.request.get('place')
         post_object_id = graph.put_wall_post(message, attachment)
