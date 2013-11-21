@@ -5,15 +5,9 @@ api_version: 1
 threadsafe: true
 
 handlers:
-- url: /autoAdd.*
-  script: autoAdd.app
-  
 - url: /example.*
   script: example.app
 
-- url: /index
-  static_dir: index.html
-  
 - url: /hello
   script: helloworld.application
   
