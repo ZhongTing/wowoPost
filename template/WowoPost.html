@@ -9,12 +9,15 @@
         <script src="/javascript/jquery-ui.min.js"></script>
         <link rel="stylesheet" href="/style/jquery-ui.css" />
         <link rel="stylesheet" href="/style/combobox.css" />
+        <link rel="stylesheet" href="/style/message-area.css" />
         <link rel="stylesheet" href="/style/jumbotron-narrow.css" />
         <link rel="stylesheet" href="/style/bootstrap.css" />
     </head>
 
     <body>
-    
+        <div id="origin-tag" class="tag" style="display: none;"><span>Name</span>&nbsp;<button class="close" aria-hidden="true">&times;</button></div>
+        <option id="origin-option" value="test">Select one...</option>
+        
         <div class="container">
             <div class="header">
                 <ul class="nav nav-pills pull-right">
@@ -27,7 +30,42 @@
             
             {% if current_user %}
                 <div class="jumbotron">
-                    
+                    <img class="img-circle" src="http://graph.facebook.com/{{ current_user.id }}/picture?type=square" style="position: fixed; left: 5px; top: 5px;"/>        
+                    <div id="MessageArea" class="col-8">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td class="left lead">
+                                        <div>{{ current_user.name }}</div>
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <textarea id="message" name="url" class="col-12"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="tags">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <select id="FB_Friends_Combobox" style="display: none;">
+                                            <option value="">Select one...</option>
+                                        </select>
+                                        <div class="btn btn-xs btn-success" onclick="">加入</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="right">
+                                        <div class="btn btn-info" onclick="pySend()">留言</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 
             {% else %}
@@ -36,7 +74,7 @@
                     <p class="lead">Connect With Facebook Now</p>
                     <p class="lead">Then You Will be able to Feed POST to Yourself Timeline</p>
                     <p class="lead">In Any future point In time.</p>
-                    <p><fb:login-button size="xlarge" autologoutlink="true" scope="publish_stream"></fb:login-button></p>
+                    <p><fb:login-button size="xlarge" autologoutlink="true" scope="publish_stream" length="long"></fb:login-button></p>
                 </div>
                 
             {% endif %}
@@ -48,6 +86,7 @@
             </div>
         </div> 
     </body>
+    <script src="/javascript/combobox.js"></script>
     <script>
         window.fbAsyncInit = function() 
         {
@@ -63,6 +102,17 @@
                 window.location.reload();
             });
             {% endif %}
+            
+            FB.getLoginStatus(function (response) {
+                if (response.status === "connected") 
+                {  // 程式有連結到 Facebook 帳號
+                    initialFriendCombobox();
+                } 
+                else if (response.status === "not_authorized") 
+                {  // 帳號沒有連結到 Facebook 程式
+                    alert("請允許授權！");
+                }
+            });
         };
         
         (function() {
@@ -72,5 +122,42 @@
             e.async = true;
             document.getElementById('fb-root').appendChild(e);
         }());
+        
+        function pySend()
+        {
+            var message = $("#message").val();
+            
+            $.ajax({
+                type: "POST",
+                url: "/example/feed",
+                data: { message: message, tags: 1428774067, place: 108479922509500}
+            })
+                .done(function( msg ) {
+                alert( "Data: " + msg );
+                console.log(msg);
+            })
+                .error(function( msg ) {
+                alert( msg.responseText );
+            });
+        }
+        
+        function initialFriendCombobox()
+        {
+            FB.api('/me/friends', function(response){
+                var friends = response.data;
+                var origin_option = $("#origin-option");
+                var FB_Friends_Combobox = $("#FB_Friends_Combobox");
+                origin_option.removeAttr("id");
+                for(key in friends)
+                {
+                    var option = origin_option.clone();
+                    var friend = friends[key];
+                    option.val(friend.id);
+                    option.html(friend.name);
+                    FB_Friends_Combobox.append(option);
+                }
+                $("#FB_Friends_Combobox").combobox();
+            });
+        }
     </script>
 </html>

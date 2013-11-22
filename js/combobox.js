@@ -127,10 +127,3 @@
         }
     });
 })( jQuery );
-
-$(function() {
-    $( "#combobox" ).combobox();
-    $( "#toggle" ).click(function() {
-        alert($( "#combobox" ).val());
-    });
-});
