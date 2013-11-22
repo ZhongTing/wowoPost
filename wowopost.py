@@ -111,10 +111,11 @@ class MainPage(BaseHandler):
 
     def get(self):
         self.response.write('all post number = ' + str(Post.query().count()))
-        posts = Post.query(Post.sender == self.current_user['id'])
-        for p in posts:
-            self.response.write('<br/>' + str(p) + '<br/>')
-            #p.key.delete()
+        if(self.current_user!=None):
+            posts = Post.query(Post.sender == self.current_user['id'])
+            for p in posts:
+                self.response.write('<br/>' + str(p) + '<br/>')
+                #p.key.delete()
         template = jinja_environment.get_template('/index.html')
         self.response.write(template.render())
     def post(self):
@@ -124,6 +125,7 @@ class MainPage(BaseHandler):
             "client_secret": FACEBOOK_APP_SECRET,
             "fb_exchange_token": self.current_user['access_token'],
         }
+
         response = urllib2.urlopen("https://graph.facebook.com/oauth/access_token" + "?" + urllib.urlencode(args)).read()
         token = re.match( r'access_token=(.*)&.*', response).group(1)
         year = int(self.request.get('year'))
@@ -135,15 +137,15 @@ class MainPage(BaseHandler):
         post = Post(
                     message=self.request.get('message'),
                     to=self.request.get('to'),
-					time=datetime.datetime(year,month,day,hour,min),
+                    time=datetime.datetime(year,month,day,hour,min),
                     long_term_token = token,
-					sender = self.current_user['id']
+                    sender = self.current_user['id']
                     )
         key = post.put()
         self.response.write(token)
         self.response.write('<br/>')
         self.response.write(key)
-		
+        
 class PostConsumer(webapp2.RequestHandler):
     def get(self):
         posts = Post.query(Post.time < datetime.datetime.now()+datetime.timedelta(hours = 8))
