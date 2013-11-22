@@ -115,9 +115,11 @@ class MainPage(BaseHandler):
         for p in posts:
 			self.response.write('<br/>' + str(p) + '<br/>')
 			#p.key.delete()
-        template = jinja_environment.get_template('/index.html')
-        self.response.write(template.render())
-	
+        template = jinja_environment.get_template('template/wowopost.html')
+        self.response.write(template.render(dict(
+            facebook_app_id=FACEBOOK_APP_ID,
+            current_user=self.current_user
+        )))
     def post(self):
         args = {
             "grant_type": 'fb_exchange_token',
@@ -136,7 +138,7 @@ class MainPage(BaseHandler):
         
         post = Post(
                     message=self.request.get('message'),
-                    to=self.request.get('to'),
+                    tags=self.request.get('tags'),
                     time=datetime.datetime(year,month,day,hour,min),
                     long_term_token = token,
                     sender = self.current_user['id']
@@ -152,9 +154,8 @@ class PostConsumer(webapp2.RequestHandler):
         for p in posts:
             graph = facebook.GraphAPI(p.long_term_token)
             attachment = {}
-            attachment["to"] = p.to
             attachment["place"] = 108479922509500
-            attachment["tags"] = p.to
+            attachment["tags"] = p.tags
             post_object_id = graph.put_wall_post(p.message, attachment)
             self.response.write(post_object_id)
             self.response.write('<br/>')

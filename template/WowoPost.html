@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="/style/jumbotron-narrow.css" />
         <link rel="stylesheet" href="/style/bootstrap.css" />
         <link rel="stylesheet" href="/style/bootstrap-datetimepicker.min.css" />
-		<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="/style/bootstrap-combined.min.css" />
     </head>
 
     <body>
@@ -146,19 +146,31 @@
         
         function pySend()
         {
+            var picker = $('#datetimepicker').data('datetimepicker');
+            var date = picker.getLocalDate();
             var message = $("#message").val();
             var tags = "";
+            
             for(key in savedTags)
             {
                 if(tags)
                     tags += ",";
                 tags += savedTags[key].id;
             }
+            console.log(message);
             console.log(tags);
+            console.log(date);
             $.ajax({
                 type: "POST",
-                url: "/example/feed",
-                data: { message: message, tags: tags, place: 108479922509500}
+                url: "/",
+                data: { message: message, 
+                        tags: tags, 
+                        year: date.getFullYear(),
+						month: date.getMonth()+1,
+						day: date.getDate(),
+						hour: date.getHours(),
+						min: date.getMinutes()
+                }
             })
                 .done(function( msg ) {
                 alert( "Data: " + msg );
