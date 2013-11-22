@@ -1,8 +1,19 @@
 import os
+import re
 import webapp2
 import jinja2
 import datetime
+import urllib
+import urllib2
+import facebook
 from google.appengine.ext import ndb
+from webapp2_extras import sessions
+
+FACEBOOK_APP_ID = "351096461701940"
+FACEBOOK_APP_SECRET = "0939c0395ed7e7c9a2eff9ea160e794b"
+
+config = {}
+config['webapp2_extras.sessions'] = dict(secret_key='')
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__))
@@ -13,8 +24,79 @@ class Post(ndb.Model):
     to = ndb.StringProperty()
     time = ndb.DateTimeProperty()
     long_term_token = ndb.StringProperty()
+    
+class BaseHandler(webapp2.RequestHandler):
+    """Provides access to the active Facebook user in self.current_user
 
-class MainPage(webapp2.RequestHandler):
+    The property is lazy-loaded on first access, using the cookie saved
+    by the Facebook JavaScript SDK to determine the user ID of the active
+    user. See http://developers.facebook.com/docs/authentication/ for
+    more information.
+    """
+    @property
+    def current_user(self):
+        if self.session.get("user"):
+            # User is logged in
+            return self.session.get("user")
+        else:
+            # Either used just logged in or just saw the first page
+            # We'll see here
+            cookie = facebook.get_user_from_cookie(self.request.cookies,
+                                                   FACEBOOK_APP_ID,
+                                                   FACEBOOK_APP_SECRET)
+            if cookie:
+                # Okay so user logged in.
+                # Now, check to see if existing user
+                user = User.get_by_key_name(cookie["uid"])
+                if not user:
+                    # Not an existing user so get user info
+                    graph = facebook.GraphAPI(cookie["access_token"])
+                    profile = graph.get_object("me")
+                    user = User(
+                        key_name=str(profile["id"]),
+                        id=str(profile["id"]),
+                        name=profile["name"],
+                        profile_url=profile["link"],
+                        access_token=cookie["access_token"]
+                    )
+                    user.put()
+                elif user.access_token != cookie["access_token"]:
+                    user.access_token = cookie["access_token"]
+                    user.put()
+                # User is now logged in
+                self.session["user"] = dict(
+                    name=user.name,
+                    profile_url=user.profile_url,
+                    id=user.id,
+                    access_token=user.access_token
+                )
+                return self.session.get("user")
+        return None
+
+    def dispatch(self):
+        """
+        This snippet of code is taken from the webapp2 framework documentation.
+        See more at
+        http://webapp-improved.appspot.com/api/webapp2_extras/sessions.html
+
+        """
+        self.session_store = sessions.get_store(request=self.request)
+        try:
+            webapp2.RequestHandler.dispatch(self)
+        finally:
+            self.session_store.save_sessions(self.response)
+
+    @webapp2.cached_property
+    def session(self):
+        """
+        This snippet of code is taken from the webapp2 framework documentation.
+        See more at
+        http://webapp-improved.appspot.com/api/webapp2_extras/sessions.html
+
+        """
+        return self.session_store.get_session()
+    
+class MainPage(BaseHandler):
 
     def get(self):
         self.response.write('all post number = ' + str(Post.query().count()))
@@ -47,18 +129,28 @@ class MainPage(webapp2.RequestHandler):
                     long_term_token = token,
                     )
         key = post.put()
+        self.response.write(token)
+        self.response.write('<br/>')
         self.response.write(key)
 		
-class AutoAddTestCase(webapp2.RequestHandler):
+class PostConsumer(webapp2.RequestHandler):
     def get(self):
-        post = Post(
-                    message='auto test msg',
-                    to='123456789',
-                    time=datetime.datetime.now(),
-                    )
-        key = post.put()
+        posts = Post.query(Post.time < datetime.datetime.now()+datetime.timedelta(hours = 8))
+        for p in posts:
+            graph = facebook.GraphAPI(p.long_term_token)
+            attachment = {}
+            attachment["to"] = p.to
+            self.response.write(p.to)
+            attachment["place"] = 108479922509500
+            attachment["tags"] = p.to
+            post_object_id = graph.put_wall_post(p.message, attachment)
+            self.response.write(post_object_id)
+            self.response.write('<br/>')
+            p.key.delete()
+            
     
 application = webapp2.WSGIApplication(
-    [('/', MainPage),('/autoAdd',AutoAddTestCase)],
-    debug=True
+    [('/', MainPage),('/ConsumePost',PostConsumer)],
+    debug=True,
+    config=config
 )
