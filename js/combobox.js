@@ -18,6 +18,7 @@
                 .appendTo( this.wrapper )
                 .val( value )
                 .attr( "title", "" )
+                .attr( "id", "FB_Friends_Input")
                 .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
                 .autocomplete({
                     delay: 0,
@@ -127,10 +128,3 @@
         }
     });
 })( jQuery );
-
-$(function() {
-    $( "#combobox" ).combobox();
-    $( "#toggle" ).click(function() {
-        alert($( "#combobox" ).val());
-    });
-});

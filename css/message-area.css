@@ -1,0 +1,48 @@
+#MessageArea
+{
+    font-size: 12px;
+}
+
+#MessageArea textarea
+{
+    width: 100%;
+    height: 150px;
+    resize : none;
+}
+
+#MessageArea input.custom-combobox-input
+{
+    width: 150px;
+}
+
+#MessageArea div.btn
+{
+    padding: 5px 10px 5px 10px;
+}
+
+#MessageArea div.btn-xs
+{
+    font-size: 12px;
+}
+
+#MessageArea .right
+{
+    text-align: right;
+}
+
+#MessageArea .left
+{
+    text-align: left;
+}
+
+#MessageArea .tag
+{
+    min-width: 10px;
+    float: left;
+    margin-right: 3px;
+    margin-top: 3px;
+    padding: 3px 3px 3px 6px;
+    background-color: #A31D1B;
+    color: #F5EEFC;
+    border-radius: 3px;
+}
