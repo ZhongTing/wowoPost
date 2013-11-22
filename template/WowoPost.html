@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <title>WowoPost</title>
+        
+        <script src="/javascript/jquery-1.9.1.min.js"></script>
+        <script src="/javascript/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="/style/jquery-ui.css" />
+        <link rel="stylesheet" href="/style/combobox.css" />
+        <link rel="stylesheet" href="/style/jumbotron-narrow.css" />
+        <link rel="stylesheet" href="/style/bootstrap.css" />
+    </head>
+
+    <body>
+    
+        <div class="container">
+            <div class="header">
+                <ul class="nav nav-pills pull-right">
+                    <li><fb:login-button autologoutlink="true" scope="publish_stream"></fb:login-button></li>
+                </ul>
+                <h3 class="text-muted">WowoPost</h3>
+            </div>
+            
+            <div id="fb-root"></div>
+            
+            <div class="jumbotron">
+                <h1>WowoPost</h1>
+                <p class="lead">Connect With Facebook Now</p>
+                <p class="lead">Then You Will be able to Feed POST to Yourself Timeline</p>
+                <p class="lead">In Any future point In time.</p>
+                <p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>
+            </div>
+            
+            <div class="footer">
+                <p>&copy; Company 2013</p>
+            </div>
+        </div> 
+    </body>
+    <script>
+        window.fbAsyncInit = function() 
+        {
+            FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true, xfbml: true});
+            
+            {% if current_user %}
+            FB.Event.subscribe('auth.logout', function(response) {
+                window.location = "/example/logout";
+            });
+            
+            {% else %}
+            FB.Event.subscribe('auth.login', function(response) {
+                window.location.reload();
+            });
+            {% endif %}
+        };
+        
+        (function() {
+            var e = document.createElement('script');
+            e.type = 'text/javascript';
+            e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+            e.async = true;
+            document.getElementById('fb-root').appendChild(e);
+        }());
+    </script>
+</html>

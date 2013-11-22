@@ -8,10 +8,22 @@ handlers:
 - url: /example.*
   script: example.app
 
-- url: /hello
-  script: helloworld.application
-- url: /.*
-  script: wowopost.application
+- url: /style/(.*\.css)
+  static_files: css/\1
+  upload: css/(.*\.css)
+  
+- url: /javascript/(.*\.(js|map))
+  static_files: js/\1
+  upload: js/(.*\.(js|map))
+  
+- url: /favicon.ico
+  static_files: favicon.ico
+  upload: favicon.ico
+
+- url: /test
+  static_files: template/WowoPost.html
+  upload: template/WowoPost.html
+  
 libraries:
 - name: webapp2
   version: latest
