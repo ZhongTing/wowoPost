@@ -6,6 +6,8 @@ import datetime
 import urllib
 import urllib2
 import facebook
+
+from google.appengine.ext import db
 from google.appengine.ext import ndb
 from webapp2_extras import sessions
 
@@ -19,7 +21,16 @@ jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__))
 )
 
+class User(db.Model):
+    id = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    updated = db.DateTimeProperty(auto_now=True)
+    name = db.StringProperty(required=True)
+    profile_url = db.StringProperty(required=True)
+    access_token = db.StringProperty(required=True)
+
 class Post(ndb.Model):
+    sender = ndb.StringProperty()
     message = ndb.StringProperty()
     to = ndb.StringProperty()
     time = ndb.DateTimeProperty()
@@ -100,7 +111,7 @@ class MainPage(BaseHandler):
 
     def get(self):
         self.response.write('all post number = ' + str(Post.query().count()))
-        posts = Post.query(Post.time < datetime.datetime.now()+datetime.timedelta(hours = 8))
+        posts = Post.query(Post.sender == self.current_user['id'])
         for p in posts:
             self.response.write('<br/>' + str(p) + '<br/>')
             #p.key.delete()
@@ -113,8 +124,7 @@ class MainPage(BaseHandler):
             "client_secret": FACEBOOK_APP_SECRET,
             "fb_exchange_token": self.current_user['access_token'],
         }
-        response = urllib2.urlopen("https://graph.facebook.com/oauth/access_token" +
-                               "?" + urllib.urlencode(args)).read()
+        response = urllib2.urlopen("https://graph.facebook.com/oauth/access_token" + "?" + urllib.urlencode(args)).read()
         token = re.match( r'access_token=(.*)&.*', response).group(1)
         year = int(self.request.get('year'))
         month = int(self.request.get('month'))
@@ -127,6 +137,7 @@ class MainPage(BaseHandler):
                     to=self.request.get('to'),
 					time=datetime.datetime(year,month,day,hour,min),
                     long_term_token = token,
+					sender = self.current_user['id']
                     )
         key = post.put()
         self.response.write(token)
@@ -140,7 +151,6 @@ class PostConsumer(webapp2.RequestHandler):
             graph = facebook.GraphAPI(p.long_term_token)
             attachment = {}
             attachment["to"] = p.to
-            self.response.write(p.to)
             attachment["place"] = 108479922509500
             attachment["tags"] = p.to
             post_object_id = graph.put_wall_post(p.message, attachment)
