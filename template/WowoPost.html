@@ -7,11 +7,14 @@
         
         <script src="/javascript/jquery-1.9.1.min.js"></script>
         <script src="/javascript/jquery-ui.min.js"></script>
+        <script src="/javascript/bootstrap-datetimepicker.min.js"></script>
+        <script src="/javascript/bootstrap-datetimepicker.pt-BR.js"></script>
         <link rel="stylesheet" href="/style/jquery-ui.css" />
         <link rel="stylesheet" href="/style/combobox.css" />
         <link rel="stylesheet" href="/style/message-area.css" />
         <link rel="stylesheet" href="/style/jumbotron-narrow.css" />
         <link rel="stylesheet" href="/style/bootstrap.css" />
+        <link rel="stylesheet" href="/style/bootstrap-datetimepicker.min.css" />
     </head>
 
     <body>
@@ -56,6 +59,16 @@
                                             <option value="">Select one...</option>
                                         </select>
                                         <div class="btn btn-xs btn-success" onclick="addTag()">加入</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <div id="datetimepicker" class="input-append date">
+                                            <input type="text" />
+                                            <span class="add-on">
+                                                <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                                            </span>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -123,6 +136,11 @@
             e.src = document.location.protocol + '//connect.facebook.net/zh_TW/all.js';
             e.async = true;
             document.getElementById('fb-root').appendChild(e);
+            
+            $('#datetimepicker').datetimepicker({
+        		format: 'dd/MM/yyyy hh:mm:ss',
+        		language: 'pt-BR'
+        	});
         }());
         
         function pySend()
