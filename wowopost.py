@@ -32,7 +32,7 @@ class User(db.Model):
 class Post(ndb.Model):
     sender = ndb.StringProperty()
     message = ndb.StringProperty()
-    to = ndb.StringProperty()
+    tags = ndb.StringProperty()
     time = ndb.DateTimeProperty()
     long_term_token = ndb.StringProperty()
     
@@ -110,11 +110,6 @@ class BaseHandler(webapp2.RequestHandler):
 class MainPage(BaseHandler):
 
     def get(self):
-        self.response.write('all post number = ' + str(Post.query().count()))
-        posts = Post.query()
-        for p in posts:
-			self.response.write('<br/>' + str(p) + '<br/>')
-			#p.key.delete()
         template = jinja_environment.get_template('template/wowopost.html')
         self.response.write(template.render(dict(
             facebook_app_id=FACEBOOK_APP_ID,
@@ -163,6 +158,7 @@ class PostConsumer(webapp2.RequestHandler):
 
 class TaskViewer(BaseHandler):
     def get(self):
+        self.response.write('all post number = ' + str(Post.query().count()))
         posts = Post.query(Post.sender == self.current_user['id'])
         for p in posts:
             self.response.write('<br/>' + str(p) + '<br/>')
