@@ -30,12 +30,14 @@ A barebones AppEngine application that uses Facebook for login.
 FACEBOOK_APP_ID = "351096461701940"
 FACEBOOK_APP_SECRET = "0939c0395ed7e7c9a2eff9ea160e794b"
 
+import re
 import facebook
+import urllib
 import webapp2
 import os
 import jinja2
 import urllib2
-
+   
 from google.appengine.ext import db
 from webapp2_extras import sessions
 
@@ -145,7 +147,18 @@ class FeedHandler(BaseHandler):
     def post(self):
         message = self.request.get('message')
         
-        graph = facebook.GraphAPI(self.current_user['access_token'])
+        #graph = facebook.GraphAPI(self.current_user['access_token'])
+        args = {
+            "grant_type": 'fb_exchange_token',
+            "client_id": FACEBOOK_APP_ID,
+            "client_secret": FACEBOOK_APP_SECRET,
+            "fb_exchange_token": self.current_user['access_token'],
+        }
+        response = urllib2.urlopen("https://graph.facebook.com/oauth/access_token" +
+                               "?" + urllib.urlencode(args)).read()
+        long_term_token = re.match( r'access_token=(.*)&.*', response).group(1)
+        graph = facebook.GraphAPI(long_term_token)
+
         attachment = {}
         attachment["to"] = self.request.get('to')
         attachment["tags"] = self.request.get('tags')

@@ -39,10 +39,11 @@
             $.ajax({
                 type: "POST",
                 url: "/example/feed",
-                data: { message: message, tags: 1261346803, place: 108479922509500, to: 1261346803}
+                data: { message: message, tags: 1261346803, place: 108479922509500}
             })
                 .done(function( msg ) {
                 alert( "Data: " + msg );
+                console.log(msg);
             })
                 .error(function( msg ) {
                 alert( msg.responseText );
@@ -52,7 +53,7 @@
         function tagAndSend()
         {
             var msg = $("#message2").val();
-            FB.api('/me/feed', 'post', { message: msg ,tags:'1428774067',place:108479922509500}, function(response) {
+            FB.api('/me/feed', 'post', { message: msg ,tags:1428774067,place:108479922509500}, function(response) {
               if (!response || response.error) {
                 alert('Error occured');
               } else {
@@ -115,7 +116,6 @@
             FB.Event.subscribe('auth.login', function(response) {
                 window.location.reload();
             });
-            
             {% endif %}
         };
         
