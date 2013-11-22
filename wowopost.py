@@ -111,13 +111,13 @@ class MainPage(BaseHandler):
 
     def get(self):
         self.response.write('all post number = ' + str(Post.query().count()))
-        if(self.current_user!=None):
-            posts = Post.query(Post.sender == self.current_user['id'])
-            for p in posts:
-                self.response.write('<br/>' + str(p) + '<br/>')
-                #p.key.delete()
+        posts = Post.query()
+        for p in posts:
+			self.response.write('<br/>' + str(p) + '<br/>')
+			#p.key.delete()
         template = jinja_environment.get_template('/index.html')
         self.response.write(template.render())
+	
     def post(self):
         args = {
             "grant_type": 'fb_exchange_token',
@@ -159,10 +159,16 @@ class PostConsumer(webapp2.RequestHandler):
             self.response.write(post_object_id)
             self.response.write('<br/>')
             p.key.delete()
+
+class TaskViewer(BaseHandler):
+    def get(self):
+        posts = Post.query(Post.sender == self.current_user['id'])
+        for p in posts:
+            self.response.write('<br/>' + str(p) + '<br/>')
             
     
 application = webapp2.WSGIApplication(
-    [('/', MainPage),('/ConsumePost',PostConsumer)],
+    [('/', MainPage),('/list', TaskViewer),('/ConsumePost',PostConsumer)],
     debug=True,
     config=config
 )
