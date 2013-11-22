@@ -16,7 +16,7 @@
 
     <body>
         <div id="origin-tag" class="tag" style="display: none;"><span>Name</span>&nbsp;<button class="close" aria-hidden="true">&times;</button></div>
-        <option id="origin-option" value="test">Select one...</option>
+        <option id="origin-option" value="" style="display: none;"></option>
         
         <div class="container">
             <div class="header">
@@ -55,7 +55,7 @@
                                         <select id="FB_Friends_Combobox" style="display: none;">
                                             <option value="">Select one...</option>
                                         </select>
-                                        <div class="btn btn-xs btn-success" onclick="">加入</div>
+                                        <div class="btn btn-xs btn-success" onclick="addTag()">加入</div>
                                     </td>
                                 </tr>
                                 <tr>
@@ -88,6 +88,8 @@
     </body>
     <script src="/javascript/combobox.js"></script>
     <script>
+        savedTags = [];
+        
         window.fbAsyncInit = function() 
         {
             FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true, xfbml: true});
@@ -145,9 +147,9 @@
         {
             FB.api('/me/friends', function(response){
                 var friends = response.data;
-                var origin_option = $("#origin-option");
+                var origin_option = $("#origin-option").clone();
                 var FB_Friends_Combobox = $("#FB_Friends_Combobox");
-                origin_option.removeAttr("id");
+                origin_option.removeAttr("id").show();
                 for(key in friends)
                 {
                     var option = origin_option.clone();
@@ -158,6 +160,60 @@
                 }
                 $("#FB_Friends_Combobox").combobox();
             });
+        }
+        
+        function addTag()
+        {
+            var FB_Friends_Combobox = $("#FB_Friends_Combobox");
+            var FB_Friends_Combobox_Input = $("#FB_Friends_Input");
+            var obj = {"id": FB_Friends_Combobox.val(), "name": FB_Friends_Combobox_Input.val()};
+            
+            if(obj.name && !isTagsRepeat(obj))
+            {
+                savedTags.push(obj);
+                refreshTags();
+            }
+            
+            FB_Friends_Combobox_Input.val('');
+        }
+        
+        function removeTag(id)
+        {
+            for(key in savedTags)
+            {
+                if(savedTags[key].id == id)
+                {
+                    delete savedTags[key];
+                    break;
+                }
+            }
+            refreshTags();
+        }
+        
+        function isTagsRepeat(obj)
+        {
+            for(key in savedTags)
+            {
+                if(savedTags[key].id == obj.id)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        function refreshTags()
+        {
+            var origin_tag = $("#origin-tag").clone();
+            origin_tag.removeAttr("id").show();
+            $("#tags").html('');
+            for(key in savedTags)
+            {
+                var tag = origin_tag.clone();
+                tag.children("span").html(savedTags[key].name);
+                tag.children("button").attr("onclick", "removeTag('"+savedTags[key].id+"')");
+                $("#tags").append(tag);
+            }
         }
     </script>
 </html>
