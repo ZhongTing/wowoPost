@@ -1,4 +1,4 @@
 cron:
-- description: auto add test case
-  url: /autoAdd
+- description: comsume post
+  url: /ConsumePost
   schedule: every 1 minutes from 00:00 to 23:59
