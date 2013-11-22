@@ -24,6 +24,9 @@ handlers:
   static_files: template/WowoPost.html
   upload: template/WowoPost.html
   
+- url: /.*
+  script: wowopost.application
+  
 libraries:
 - name: webapp2
   version: latest
