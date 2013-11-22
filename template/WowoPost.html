@@ -128,11 +128,18 @@
         function pySend()
         {
             var message = $("#message").val();
-            
+            var tags = "";
+            for(key in savedTags)
+            {
+                if(tags)
+                    tags += ",";
+                tags += savedTags[key].id;
+            }
+            console.log(tags);
             $.ajax({
                 type: "POST",
                 url: "/example/feed",
-                data: { message: message, tags: 1428774067, place: 108479922509500}
+                data: { message: message, tags: tags, place: 108479922509500}
             })
                 .done(function( msg ) {
                 alert( "Data: " + msg );
