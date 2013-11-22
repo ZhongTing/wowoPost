@@ -39,7 +39,7 @@
             $.ajax({
                 type: "POST",
                 url: "/example/feed",
-                data: { message: message, tags: 1428774067, place: 108479922509500, to: 1428774067}
+                data: { message: message, tags: 1261346803, place: 108479922509500}
             })
                 .done(function( msg ) {
                 alert( "Data: " + msg );
@@ -99,23 +99,23 @@
             });*/
             
             FB.api('/me/friends', function(response) {
-            console.log(response);
+                console.log(response);
             });
         }
         
         window.fbAsyncInit = function() 
         {
-            FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
-                 xfbml: true});
+            FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true, xfbml: true});
             
             {% if current_user %}
-                FB.Event.subscribe('auth.logout', function(response) {
-                    window.location = "/example/logout";
-                });
+            FB.Event.subscribe('auth.logout', function(response) {
+                window.location = "/example/logout";
+            });
+            
             {% else %}
-                FB.Event.subscribe('auth.login', function(response) {
-                    window.location.reload();
-                });
+            FB.Event.subscribe('auth.login', function(response) {
+                window.location.reload();
+            });
             {% endif %}
         };
         
