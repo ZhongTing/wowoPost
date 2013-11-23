@@ -151,7 +151,7 @@ class PostConsumer(webapp2.RequestHandler):
             attachment = {}
             attachment["place"] = 108479922509500
             attachment["tags"] = p.tags
-            post_object_id = graph.put_wall_post(p.message, attachment)
+            post_object_id = graph.put_wall_post(p.message.encode('utf-8'), attachment)
             self.response.write(post_object_id)
             self.response.write('<br/>')
             p.key.delete()
